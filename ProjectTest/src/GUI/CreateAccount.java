@@ -1,47 +1,24 @@
+package GUI;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
-public class Login{
-	private static JFrame MyJFrame = new JFrame("은행 로그인");
-	private static JTextField MyId = new JTextField();
-	private static JPasswordField MyPw = new JPasswordField();
-	private static JButton OK = new JButton("로그인");
-	private static JButton Create = new JButton("새계정");
-	private static JLabel ID = new JLabel("ID입력 : ");
-	private static JLabel PW = new JLabel("PW입력 : ");
-	public static void main(String[] args) {
-		MyJFrame.setLayout(null);
-		MyJFrame.setBounds(200, 100, 360, 300);
-		MyJFrame.setVisible(true);
-		MyJFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		ID.setBounds(20, 60, 80, 30);
-		MyId.setBounds(80, 60, 210, 30);
-		PW.setBounds(20, 110, 80, 30);
-		MyPw.setBounds(80, 110, 210, 30);
-		OK.setBounds(90, 180, 80, 30);
-		Create.setBounds(190, 180, 80, 30);
-		
-		MyJFrame.add(ID);
-		MyJFrame.add(MyId);
-		MyJFrame.add(PW);
-		MyJFrame.add(MyPw);
-		MyJFrame.add(OK);
-		MyJFrame.add(Create);
-		
-		Create.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				new CreateAccount();
-			}
-		});
-	}
-}
-class CreateAccount extends JFrame{
-	CreateAccount(){
-		setTitle("계정생성");
-		JFrame First = new JFrame();
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import GUI.DB;
+
+public class CreateAccount extends JFrame {
+	public CreateAccount(){
+		JFrame First = new JFrame("계정생성");
 		JLabel NID = new JLabel("새로운 ID: ");
 		JLabel NPW = new JLabel("새로운 비밀번호: ");
 		JLabel PWOK = new JLabel("비밀번호 확인: ");
@@ -54,8 +31,7 @@ class CreateAccount extends JFrame{
 		
 		First.setLayout(null);
 		First.setBounds(200, 100, 430, 300);
-		First.setVisible(true)
-		;
+		First.setVisible(true);
 		NID.setBounds(20, 30, 100, 30);
 		NID2.setBounds(150, 30, 210, 30);
 		NPW.setBounds(20, 70, 100, 30);
@@ -76,6 +52,7 @@ class CreateAccount extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				DB db = new DB();
 				String PW1 ="";
 				String PW2 ="";
 				char[] secret_pw = NPW2.getPassword();
@@ -90,8 +67,15 @@ class CreateAccount extends JFrame{
 				}
 				if(PW1.equals(PW2)) {
 					//DB에 저장하는 코드 추가
-					JOptionPane.showMessageDialog(null, "계정이 생성되었습니다.","계정 생성 성공",JOptionPane.PLAIN_MESSAGE);
-					First.dispose();
+					boolean b;
+					b = db.DBInsert(NID2.getText(), PW1);
+					if(b==true) {
+						JOptionPane.showMessageDialog(null, "계정이 생성되었습니다.","계정 생성 성공",JOptionPane.PLAIN_MESSAGE);
+						First.dispose();
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "DB삽입오류","DB에 추가되지 않았습니다.",JOptionPane.PLAIN_MESSAGE);
+					}
 				}
 				else if(!PW1.equals(PW2)) {
 					JOptionPane.showMessageDialog(null, "비밀번호가 다릅니다.","비밀번호 오류",JOptionPane.PLAIN_MESSAGE);
